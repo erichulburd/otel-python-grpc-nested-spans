@@ -1,0 +1,43 @@
+version: '3.4'
+
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:1.39
+    environment:
+      COLLECTOR_ZIPKIN_HTTP_PORT: 9411
+      COLLECTOR_OTLP_ENABLED: true
+    ports:
+      - 5775:5775/udp
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 5778:5778
+      - 16686:16686
+      - 14269:14269
+      - 9411:9411
+
+  server:
+    environment:
+      # See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#jaeger-exporter
+      OTEL_EXPORTER_JAEGER_ENDPOINT: "http://jaeger:14268/api/traces"
+      SERVICE_NAME: "server"
+    build:
+      context: .
+    command: ["python", "otel_python_grpc_nested_spans/server.py"]
+    expose:
+      - 50051
+    # See https://github.com/peter-evans/docker-compose-healthcheck
+    healthcheck:
+      test: ["CMD-SHELL", "/bin/grpc_health_probe"]
+    depends_on:
+      - jaeger
+
+  client:
+    environment:
+      # See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md#jaeger-exporter
+      OTEL_EXPORTER_JAEGER_ENDPOINT: "http://jaeger:14268/api/traces"
+      SERVICE_NAME: "client"
+    build:
+      context: .
+    command: [ "python", "otel_python_grpc_nested_spans/client.py" ]
+    depends_on:
+      - server

@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package github.com.erichulburd.otel_grpc_nested_spans;
+
+service Sleeper {
+  rpc Sleep(SleepRequest) returns (SleepResponse) {}
+}
+
+message SleepRequest {
+  float amount = 1;
+}
+
+message SleepResponse {
+  float amount = 1;
+}
