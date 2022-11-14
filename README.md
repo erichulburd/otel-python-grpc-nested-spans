@@ -11,3 +11,7 @@ docker compose up --build
 ```
 
 Lookup [service="client" and operation="client-process"](http://localhost:16686/search?limit=20&lookback=1h&maxDuration&minDuration&operation=client-process&service=client) in the Jaeger UI. You should see one neat span containing 5 gRPCs from the client to the server, each interspersed with a random (sent from server) and deterministic sleep interval. Each server span will likewise include a random (sent from client) and deterministic sleep interval.
+
+Your trace should look similar to the below trace:
+
+![spans](spans.png)
